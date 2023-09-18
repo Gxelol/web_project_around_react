@@ -1,7 +1,6 @@
 # Projeto 11: Around the U.S. (With React)
 ### Overview
 * Introduction
-* Link to the site
 
 **Introduction**
 
@@ -10,6 +9,3 @@
 
   Ps: It was made this exactly project without react, you can come and see it through this link: https://github.com/Gxelol/web_project_4_ptbr.
 
-**Link**
-
-Take a look at the project: [Link to the project at Github Pages]()
