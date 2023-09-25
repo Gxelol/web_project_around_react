@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 
+import EditProfilePopup from "./EditProfilePopup.jsx";
+import EditAvatarPopup from "./EditAvatarPopup.jsx";
 import PopupWithForm from "./PopupWithForm.jsx";
 import ImagePopup from "./ImagePopup.jsx";
 import Header from "./Header.jsx";
 import Main from "./Main.jsx";
 import Footer from "./Footer.jsx";
 import Api from "../utils/api.js";
+
+import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 
 export const api = new Api(
   "https://around.nomoreparties.co/v1/web_ptbr_05",
@@ -19,6 +23,7 @@ export default function App(props) {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
   const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = useState(false);
+  const [currentUser, setUser] = useState({});
   const [selectedCard, setSelectedCard] = useState();
 
   function handleEditAvatarClick() {
@@ -57,6 +62,21 @@ export default function App(props) {
     document.querySelector(".container__semitransparent").style.opacity = "1";
   }
 
+  function handleUpdateUser(name, about) {
+    api.editProfile(name, about).then((data) => {
+      setUser(data);
+      closeAllPopups();
+    });
+  }
+
+  function handleUpdateAvatar(avatarLink) {
+    api.editProfilePicture(avatarLink).then((data) => {
+      console.log(data);
+      setUser({ ...currentUser, avatar: data.avatar });
+      closeAllPopups();
+    });
+  }
+
   function closeAllPopups() {
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
@@ -72,117 +92,79 @@ export default function App(props) {
     api.getServerCards().then((card) => {
       setCards(card);
     });
+
+    api.getUserInfo().then((user) => {
+      setUser(user);
+    });
   }, []);
 
   return (
-    <div className="container">
-      <div className="container__semitransparent"></div>
+    <CurrentUserContext.Provider value={currentUser}>
+      <div className="container">
+        <div className="container__semitransparent"></div>
 
-      <div className="page">
-        <Header />
+        <div className="page">
+          <Header />
 
-        <Main
-          cards={cardsData}
-          onEditProfileClick={handleEditProfileClick}
-          onEditAvatarClick={handleEditAvatarClick}
-          isAddPlacePopupClick={handleAddPlaceClick}
-          isTrashIconClick={handleTrashIconClick}
-          onCardClick={handleCardClick}
-        />
+          <Main
+            user={currentUser}
+            cards={cardsData}
+            setCards={setCards}
+            onEditProfileClick={handleEditProfileClick}
+            onEditAvatarClick={handleEditAvatarClick}
+            isAddPlacePopupClick={handleAddPlaceClick}
+            isTrashIconClick={handleTrashIconClick}
+            onCardClick={handleCardClick}
+          />
 
-        <Footer />
-      </div>
+          <Footer />
+        </div>
 
-      <PopupWithForm
-        title="Editar perfil"
-        buttonText="Salvar"
-        name=""
-        buttonClass="popup__save-button"
-        formName="profile__form"
-        formClass="popup__form_edit-profile"
-        isOpen={isEditProfilePopupOpen}
-        onClose={closeAllPopups}
-      >
-        <input
-          type="text"
-          name="nameP"
-          placeholder="Nome"
-          className="popup__input popup__input-name"
-          required
-          id="name-input"
-          minLength="2"
-          maxLength="40"
-        />
-        <span className="popup__placeholder name-input-error"></span>
+        <EditProfilePopup 
+          isOpen={isEditProfilePopupOpen} 
+          onClose={closeAllPopups}
+          onUpdateUser={handleUpdateUser}
+        /> 
 
-        <input
-          type="text"
-          name="about"
-          placeholder="Sobre mim"
-          className="popup__input popup__input-about"
-          id="about-input"
-          required
-          minLength="2"
-          maxLength="200"
-        />
+        <PopupWithForm
+          title="Novo Local"
+          name="location"
+          buttonText="Criar"
+          buttonClass="location__create-button"
+          formName="form_local"
+          formClass="popup__form_local"
+          isOpen={isAddPlacePopupOpen}
+          onClose={closeAllPopups}
+        >
+          <input
+            type="text"
+            name="name"
+            placeholder="Título"
+            className="popup__input popup__input-name location__input-title"
+            id="title-input"
+            required
+            minLength="2"
+            maxLength="30"
+          />
+          <span className="popup__placeholder title-input-error"></span>
+          <input
+            type="url"
+            name="link"
+            placeholder="Link de imagem"
+            className="popup__input location__input-url"
+            id="url-input"
+            required
+          />
+          <span className="location__placeholder url-input-error"></span>
+        </PopupWithForm>
 
-        <span className="popup__placeholder about-input-error"></span>
-      </PopupWithForm>
+        <EditAvatarPopup 
+          isOpen={isEditAvatarPopupOpen} 
+          onClose={closeAllPopups}
+          onUpdateAvatar={handleUpdateAvatar}
+        /> 
 
-      <PopupWithForm
-        title="Novo Local"
-        name="location"
-        buttonText="Criar"
-        buttonClass="location__create-button"
-        formName="form_local"
-        formClass="popup__form_local"
-        isOpen={isAddPlacePopupOpen}
-        onClose={closeAllPopups}
-      >
-        <input
-          type="text"
-          name="name"
-          placeholder="Título"
-          className="popup__input popup__input-name location__input-title"
-          id="title-input"
-          required
-          minLength="2"
-          maxLength="30"
-        />
-        <span className="popup__placeholder title-input-error"></span>
-        <input
-          type="url"
-          name="link"
-          placeholder="Link de imagem"
-          className="popup__input location__input-url"
-          id="url-input"
-          required
-        />
-        <span className="location__placeholder url-input-error"></span>
-      </PopupWithForm>
-
-      <PopupWithForm
-        title="Alterar a foto de perfil"
-        buttonText="Salvar"
-        buttonClass="edit-profile__button"
-        name="edit-profile"
-        formName="form_edit-profile"
-        formClass="edit-profile__form"
-        isOpen={isEditAvatarPopupOpen}
-        onClose={closeAllPopups}
-      >
-        <input
-          type="url"
-          name="linkProfilePic"
-          placeholder="Link"
-          className="popup__input edit-profile__input-url"
-          id="edit-profile-input"
-          required
-        />
-        <span className="edit-profile-input-error"></span>
-      </PopupWithForm>
-
-      <PopupWithForm
+        {/* <PopupWithForm
           title="Tem certeza?"
           buttonText="Sim"
           buttonClass="confirmation__button"
@@ -190,13 +172,15 @@ export default function App(props) {
           formClass="confirmation__form"
           isOpen={isConfirmationPopupOpen}
           onClose={closeAllPopups}
-        />
+          onSubmit={handleDeleteCard}
+        /> */}
 
-      <ImagePopup
-        card={selectedCard}
-        isOpen={isImagePopupOpen}
-        onClose={closeAllPopups}
-      />
-    </div>
+        <ImagePopup
+          card={selectedCard}
+          isOpen={isImagePopupOpen}
+          onClose={closeAllPopups}
+        />
+      </div>
+    </CurrentUserContext.Provider>
   );
 }
