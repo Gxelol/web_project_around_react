@@ -15,7 +15,7 @@ export default function PopupWithForm(props) {
         >
           <fieldset className="popup__set">
             {props.children}
-            <button type="submit" className={`popup__submit ${props.buttonClass}`} >
+            <button type="button" className={`popup__submit ${props.buttonClass}`} onClick={props.onSubmit}>
               {props.buttonText}
             </button>
           </fieldset>
