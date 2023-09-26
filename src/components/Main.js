@@ -1,7 +1,7 @@
 import addIcon from "../images/Vectorplus.svg";
 import editIcon from "../images/Vectoredit.svg";
 
-import Card from "./Card.jsx";
+import Card from "./Card.js";
 
 export default function Main(props) {
 
