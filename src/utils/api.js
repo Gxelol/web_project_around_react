@@ -1,4 +1,4 @@
-export default class Api {
+class Api {
   constructor(url, authorization) {
     this._url = url;
     this._authorization = authorization;
@@ -225,3 +225,5 @@ export default class Api {
     }
   }
 }
+
+export default Api;
