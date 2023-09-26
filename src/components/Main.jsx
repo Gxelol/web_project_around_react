@@ -3,34 +3,14 @@ import editIcon from "../images/Vectoredit.svg";
 
 import Card from "./Card.jsx";
 
-import { api } from './App.js';
-
-import { useContext } from "react";
-import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
-
 export default function Main(props) {
-
-  const currentUser = useContext(CurrentUserContext);
-
-  function handleCardLike(card) {
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
-
-    api.changeLikeCardStatus(card._id, isLiked).then((newCard) => {
-      props.setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
-    });
-  }
-
-  function handleDeleteCard(card) {
-    api.deleteCard(card._id);
-    props.setCards((state) => state.filter((c) => c._id !== card._id));
-  }
 
   return (
     <>
       <main className="content">
         <section className="profile">
           <img
-            src={currentUser.avatar}
+            src={props.currentUser.avatar}
             alt="Foto de perfil"
             className="profile__image"
           />
@@ -40,8 +20,8 @@ export default function Main(props) {
           ></div>
           <div className="profile__info">
             <div>
-              <h1 className="profile__title">{currentUser.name}</h1>
-              <p className="profile__text">{currentUser.about}</p>
+              <h1 className="profile__title">{props.currentUser.name}</h1>
+              <p className="profile__text">{props.currentUser.about}</p>
             </div>
 
             <button
@@ -67,9 +47,9 @@ export default function Main(props) {
               <Card
                 card={card}
                 key={card._id}
-                onCardLike={handleCardLike}
+                onCardLike={props.handleCardLike}
                 onCardClick={props.onCardClick}
-                onCardDelete={handleDeleteCard}
+                onCardDelete={props.handleDeleteCard}
               />
             ))}
           </ul>
