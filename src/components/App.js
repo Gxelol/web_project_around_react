@@ -6,15 +6,11 @@ import ImagePopup from "./ImagePopup.js";
 import Header from "./Header.js";
 import Main from "./Main.js";
 import Footer from "./Footer.js";
-import Api from "../utils/api.js";
+
+import { api } from '../utils/api.js';
 
 import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 import AddPlacePopup from './AddPlacePopup.js';
-
-export const api = new Api(
-  "https://around.nomoreparties.co/v1/web_ptbr_05",
-  "2435b682-2492-4802-b266-a6d24ed22bde"
-);
 
 export default function App(props) {
   const [cards, setCards] = useState([]);
