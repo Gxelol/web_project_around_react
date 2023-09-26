@@ -7,7 +7,7 @@ import Header from "./Header.js";
 import Main from "./Main.js";
 import Footer from "./Footer.js";
 
-import api from '../utils/constants.js';
+import api from '../utils/api.js';
 
 import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 import AddPlacePopup from './AddPlacePopup.js';
