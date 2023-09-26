@@ -28,7 +28,7 @@ export default function AddPlacePopup(props) {
       formName="form_local"
       formClass="popup__form_local"
       isOpen={props.isOpen}
-      onClose={props.closeAllPopups}
+      onClose={props.onClose}
       onSubmit={handleSubmit}
     >
       <input
