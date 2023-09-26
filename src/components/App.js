@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 
 import EditProfilePopup from "./EditProfilePopup.jsx";
 import EditAvatarPopup from "./EditAvatarPopup.jsx";
-import PopupWithForm from "./PopupWithForm.jsx";
 import ImagePopup from "./ImagePopup.jsx";
 import Header from "./Header.jsx";
 import Main from "./Main.jsx";
@@ -10,6 +9,7 @@ import Footer from "./Footer.jsx";
 import Api from "../utils/api.js";
 
 import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
+import AddPlacePopup from './AddPlacePopup.js';
 
 export const api = new Api(
   "https://around.nomoreparties.co/v1/web_ptbr_05",
@@ -17,12 +17,11 @@ export const api = new Api(
 );
 
 export default function App(props) {
-  const [cardsData, setCards] = useState([]);
+  const [cards, setCards] = useState([]);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
-  const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = useState(false);
   const [currentUser, setUser] = useState({});
   const [selectedCard, setSelectedCard] = useState();
 
@@ -55,13 +54,6 @@ export default function App(props) {
     document.querySelector(".container__semitransparent").style.opacity = "1";
   }
 
-  function handleTrashIconClick(card) {
-    setIsConfirmationPopupOpen(!isConfirmationPopupOpen);
-    document.querySelector(".container__semitransparent").style.visibility =
-      "visible";
-    document.querySelector(".container__semitransparent").style.opacity = "1";
-  }
-
   function handleUpdateUser(name, about) {
     api.editProfile(name, about).then((data) => {
       setUser(data);
@@ -77,15 +69,34 @@ export default function App(props) {
     });
   }
 
+  function handleAddPlaceSubmit(cardName, cardLink) {
+    api.addNewCard(cardName, cardLink).then((newCard) => {
+      setCards([newCard, ...cards]);
+    })
+    closeAllPopups();
+  }
+
   function closeAllPopups() {
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setIsImagePopupOpen(false);
-    setIsConfirmationPopupOpen(false);
     document.querySelector(".container__semitransparent").style.visibility =
       "hidden";
     document.querySelector(".container__semitransparent").style.opacity = "0";
+  }
+  
+  function handleCardLike(card) {
+    const isLiked = card.likes.some(i => i._id === currentUser._id);
+
+    api.changeLikeCardStatus(card._id, isLiked).then((newCard) => {
+      setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
+    });
+  }
+
+  function handleDeleteCard(card) {
+    api.deleteCard(card._id);
+    setCards((state) => state.filter((c) => c._id !== card._id));
   }
 
   useEffect(() => {
@@ -107,13 +118,13 @@ export default function App(props) {
           <Header />
 
           <Main
-            user={currentUser}
-            cards={cardsData}
-            setCards={setCards}
+            currentUser={currentUser}
+            cards={cards}
             onEditProfileClick={handleEditProfileClick}
             onEditAvatarClick={handleEditAvatarClick}
             isAddPlacePopupClick={handleAddPlaceClick}
-            isTrashIconClick={handleTrashIconClick}
+            handleCardLike={handleCardLike}
+            handleDeleteCard={handleDeleteCard}
             onCardClick={handleCardClick}
           />
 
@@ -124,56 +135,19 @@ export default function App(props) {
           isOpen={isEditProfilePopupOpen} 
           onClose={closeAllPopups}
           onUpdateUser={handleUpdateUser}
-        /> 
+        />       
 
-        <PopupWithForm
-          title="Novo Local"
-          name="location"
-          buttonText="Criar"
-          buttonClass="location__create-button"
-          formName="form_local"
-          formClass="popup__form_local"
-          isOpen={isAddPlacePopupOpen}
+        <AddPlacePopup 
+          isOpen={isAddPlacePopupOpen} 
           onClose={closeAllPopups}
-        >
-          <input
-            type="text"
-            name="name"
-            placeholder="Título"
-            className="popup__input popup__input-name location__input-title"
-            id="title-input"
-            required
-            minLength="2"
-            maxLength="30"
-          />
-          <span className="popup__placeholder title-input-error"></span>
-          <input
-            type="url"
-            name="link"
-            placeholder="Link de imagem"
-            className="popup__input location__input-url"
-            id="url-input"
-            required
-          />
-          <span className="location__placeholder url-input-error"></span>
-        </PopupWithForm>
+          onAddPlaceSubmit={handleAddPlaceSubmit}
+        />       
 
         <EditAvatarPopup 
           isOpen={isEditAvatarPopupOpen} 
           onClose={closeAllPopups}
           onUpdateAvatar={handleUpdateAvatar}
         /> 
-
-        {/* <PopupWithForm
-          title="Tem certeza?"
-          buttonText="Sim"
-          buttonClass="confirmation__button"
-          name="confirmation"
-          formClass="confirmation__form"
-          isOpen={isConfirmationPopupOpen}
-          onClose={closeAllPopups}
-          onSubmit={handleDeleteCard}
-        /> */}
 
         <ImagePopup
           card={selectedCard}
