@@ -3,14 +3,18 @@ import editIcon from "../images/Vectoredit.svg";
 
 import Card from "./Card.js";
 
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import { useContext } from 'react';
+
 export default function Main(props) {
+  const currentUser = useContext(CurrentUserContext);
 
   return (
     <>
       <main className="content">
         <section className="profile">
           <img
-            src={props.currentUser.avatar}
+            src={currentUser.avatar}
             alt="Foto de perfil"
             className="profile__image"
           />
@@ -20,8 +24,8 @@ export default function Main(props) {
           ></div>
           <div className="profile__info">
             <div>
-              <h1 className="profile__title">{props.currentUser.name}</h1>
-              <p className="profile__text">{props.currentUser.about}</p>
+              <h1 className="profile__title">{currentUser.name}</h1>
+              <p className="profile__text">{currentUser.about}</p>
             </div>
 
             <button
