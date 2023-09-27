@@ -15,8 +15,6 @@ export default function EditProfilePopup(props) {
   }, [currentUser]);
 
   function handleChange(e) {
-    e.preventDefault();
-
     e.target.name === "nameP"
       ? setName(e.target.value)
       : setAbout(e.target.value);
