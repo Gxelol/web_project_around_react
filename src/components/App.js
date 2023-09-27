@@ -19,49 +19,36 @@ export default function App(props) {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
-  const [currentUser, setUser] = useState({});
+  const [currentUser, setCurrentUser] = useState({});
   const [selectedCard, setSelectedCard] = useState();
 
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(!isEditAvatarPopupOpen);
-    document.querySelector(".container__semitransparent").style.visibility =
-      "visible";
-    document.querySelector(".container__semitransparent").style.opacity = "1";
   }
 
   function handleEditProfileClick() {
     setIsEditProfilePopupOpen(!isEditProfilePopupOpen);
-    document.querySelector(".container__semitransparent").style.visibility =
-      "visible";
-    document.querySelector(".container__semitransparent").style.opacity = "1";
   }
 
   function handleAddPlaceClick() {
     setIsAddPlacePopupOpen(!isAddPlacePopupOpen);
-    document.querySelector(".container__semitransparent").style.visibility =
-      "visible";
-    document.querySelector(".container__semitransparent").style.opacity = "1";
   }
 
   function handleCardClick(card) {
     setSelectedCard(card);
     setIsImagePopupOpen(!isImagePopupOpen);
-    document.querySelector(".container__semitransparent").style.visibility =
-      "visible";
-    document.querySelector(".container__semitransparent").style.opacity = "1";
   }
 
   function handleUpdateUser(name, about) {
     api.editProfile(name, about).then((data) => {
-      setUser(data);
+      setCurrentUser(data);
       closeAllPopups();
     });
   }
 
   function handleUpdateAvatar(avatarLink) {
     api.editProfilePicture(avatarLink).then((data) => {
-      console.log(data);
-      setUser({ ...currentUser, avatar: data.avatar });
+      setCurrentUser({ ...currentUser, avatar: data.avatar });
       closeAllPopups();
     });
   }
@@ -78,9 +65,6 @@ export default function App(props) {
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setIsImagePopupOpen(false);
-    document.querySelector(".container__semitransparent").style.visibility =
-      "hidden";
-    document.querySelector(".container__semitransparent").style.opacity = "0";
   }
   
   function handleCardLike(card) {
@@ -102,14 +86,14 @@ export default function App(props) {
     });
 
     api.getUserInfo().then((user) => {
-      setUser(user);
+      setCurrentUser(user);
     });
   }, []);
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="container">
-        <div className="container__semitransparent"></div>
+        <div className={`container__semitransparent ${isImagePopupOpen || isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen ? 'container__semitransparent_active' : ''}`}></div>
 
         <div className="page">
           <Header />
