@@ -93,7 +93,11 @@ export default function App(props) {
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="container">
-        <div className={`container__semitransparent ${isImagePopupOpen || isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen ? 'container__semitransparent_active' : ''}`}></div>
+        <div className={`container__semitransparent 
+        ${isImagePopupOpen || 
+        isEditAvatarPopupOpen || 
+        isEditProfilePopupOpen || 
+        isAddPlacePopupOpen ? 'container__semitransparent_active' : ''}`}></div>
 
         <div className="page">
           <Header />
